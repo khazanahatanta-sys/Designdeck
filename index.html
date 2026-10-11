@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesignDeck Studio — Professional Creative Toolkit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2canvas for PNG Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Dynamic Google Fonts injected here -->
+    <link id="dynamic-google-fonts" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dd: {
+                            bg: '#FAFAF8',
+                            surface: '#FFFFFF',
+                            text: '#252525',
+                            muted: '#737373',
+                            border: '#E8E8E5',
+                            accent: '#5278D8',
+                            accentHover: '#3B60C4',
+                            subtle: '#F4F4F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FAFAF8;
+            color: #252525;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #FAFAF8; }
+        ::-webkit-scrollbar-thumb { background: #D4D4CE; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A3A39E; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes dinoIdle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(1deg); }
+        }
+        .dino-float { animation: dinoIdle 3s ease-in-out infinite; }
+        @keyframes waveHand {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(14deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        .dino-hand { animation: waveHand 1.5s ease-in-out infinite; transform-origin: bottom right; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-dd-accent selection:text-white">
+
+    <!-- WELCOME DINOSAUR OVERLAY -->
+    <div id="welcome-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-dd-surface max-w-lg w-full rounded-3xl border border-dd-border p-8 shadow-2xl text-center relative overflow-hidden animate-fade">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-blue-100 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-amber-100 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+
+            <!-- Original SVG Dinosaur Mascot -->
+            <div class="w-32 h-32 mx-auto mb-6 dino-float relative flex items-center justify-center bg-blue-50/80 rounded-full border border-blue-100 shadow-inner cursor-pointer" onclick="app.interactDino()" title="Klik aku!">
+                <svg viewBox="0 0 120 120" class="w-24 h-24 drop-br-md">
+                    <!-- Tail -->
+                    <path d="M 30,85 C 15,85 10,75 15,65 C 20,70 25,75 35,78 Z" fill="#5278D8" />
+                    <!-- Body -->
+                    <ellipse cx="60" cy="70" rx="25" ry="20" fill="#5278D8" />
+                    <!-- Back Spikes -->
+                    <polygon points="45,52 50,42 55,52" fill="#3B60C4" />
+                    <polygon points="55,50 62,38 68,50" fill="#3B60C4" />
+                    <polygon points="68,52 74,42 80,52" fill="#3B60C4" />
+                    <!-- Head -->
+                    <circle cx="80" cy="55" r="16" fill="#5278D8" />
+                    <!-- Snout -->
+                    <ellipse cx="92" cy="57" rx="8" ry="6" fill="#6B8EE6" />
+                    <!-- Eye -->
+                    <circle cx="85" cy="51" r="2.5" fill="#FFFFFF" />
+                    <circle cx="86" cy="51" r="1.2" fill="#252525" />
+                    <!-- Cheeks -->
+                    <circle cx="89" cy="58" r="2" fill="#F472B6" opacity="0.8" />
+                    <!-- Smile -->
+                    <path d="M 90,61 Q 93,64 96,61" stroke="#252525" stroke-width="1.5" stroke-linecap="round" fill="none" />
+                    <!-- Legs -->
+                    <rect x="48" y="85" width="6" height="12" rx="3" fill="#3B60C4" />
+                    <rect x="68" y="85" width="6" height="12" rx="3" fill="#3B60C4" />
+                    <!-- Waving Arm -->
+                    <g class="dino-hand" transform="translate(68, 62)">
+                        <rect x="0" y="0" width="5" height="10" rx="2.5" fill="#6B8EE6" />
+                    </g>
+                </svg>
+                <div class="absolute bottom-1 right-2 text-[10px] bg-white px-2 py-0.5 rounded-full border border-blue-200 font-mono text-dd-accent shadow-xs" id="dino-speech-bubble">Halo! 🦕</div>
+            </div>
+
+            <h2 class="text-2xl font-bold tracking-tight text-dd-text mb-2">Welcome to DesignDeck!</h2>
+            <p class="text-dd-muted text-sm mb-8 leading-relaxed">Selamat datang, kreator! Yuk, mulai berkreasi dengan gradient, font, ikon, poster, dan kutipan profesional dalam satu studio.</p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button onclick="app.closeWelcome(true)" class="w-full sm:w-auto px-6 py-3 bg-dd-accent text-white font-semibold rounded-2xl hover:bg-dd-accentHover transition-colors shadow-sm text-sm flex items-center justify-center space-x-2">
+                    <span class="text-lg">✨</span>
+                    <span>Mulai Berkreasi</span>
+                </button>
+                <button onclick="app.closeWelcome(false)" class="w-full sm:w-auto px-6 py-3 bg-dd-subtle hover:bg-dd-border text-dd-text font-semibold rounded-2xl transition-colors text-sm">
+                    Lihat Fitur
+                </button>
+            </div>
+            <div class="mt-6 text-[11px] text-dd-muted font-mono">DesignDeck Studio v4.0 • 100% Offline Ready</div>
+        </div>
+    </div>
+
+    <!-- MOBILE HEADER -->
+    <header class="md:hidden flex items-center justify-between px-6 py-4 bg-dd-surface border-b border-dd-border sticky top-0 z-40">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-dd-accent flex items-center justify-center text-white font-bold text-base shadow-sm">D</div>
+            <span class="font-bold text-lg tracking-tight">DesignDeck</span>
+        </div>
+        <button id="mobile-menu-btn" onclick="app.toggleMobileMenu()" class="p-2 rounded-xl text-dd-muted hover:bg-dd-subtle focus:outline-none">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <!-- MOBILE DRAWER -->
+    <div id="mobile-drawer" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden md:hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-72 bg-dd-surface border-r border-dd-border p-6 flex flex-col justify-between shadow-2xl animate-fade">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-dd-accent flex items-center justify-center text-white font-bold">D</div>
+                        <span class="font-bold text-lg">DesignDeck</span>
+                    </div>
+                    <button onclick="app.toggleMobileMenu()" class="p-2 rounded-xl text-dd-muted hover:bg-dd-subtle">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <nav class="space-y-1.5" id="mobile-nav-links"></nav>
+            </div>
+            <div class="pt-6 border-t border-dd-border text-xs text-dd-muted text-center font-mono">
+                DesignDeck Studio v4.0
+            </div>
+        </div>
+    </div>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-68 bg-dd-surface border-r border-dd-border h-screen sticky top-0 z-30 p-6 shrink-0">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-10 h-10 rounded-2xl bg-dd-accent flex items-center justify-center text-white font-bold text-xl shadow-md">D</div>
+            <div>
+                <h1 class="font-bold text-base tracking-tight leading-tight">DesignDeck</h1>
+                <p class="text-xs text-dd-muted font-mono">Creative Studio v4.0</p>
+            </div>
+        </div>
+
+        <nav class="space-y-1.5 flex-1 overflow-y-auto pr-1" id="desktop-nav-links"></nav>
+
+        <div class="pt-4 border-t border-dd-border mt-auto space-y-3">
+            <div class="bg-dd-subtle rounded-2xl p-3.5 text-xs text-dd-muted">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-semibold text-dd-text flex items-center gap-1.5"><i data-lucide="volume-2" class="w-3.5 h-3.5 text-dd-accent"></i> Sound FX</span>
+                    <button onclick="soundManager.toggleSound()" id="sound-toggle-btn" class="px-2 py-0.5 rounded-lg bg-dd-surface border border-dd-border font-bold text-[10px] text-dd-accent">ON</button>
+                </div>
+                <div class="flex items-center justify-between text-[11px]">
+                    <span>Volume</span>
+                    <input type="range" min="0" max="1" step="0.1" value="0.5" onchange="soundManager.setVolume(this.value)" class="w-20 accent-dd-accent cursor-pointer">
+                </div>
+            </div>
+
+            <button onclick="app.openWelcome(false)" class="w-full py-2.5 bg-dd-subtle hover:bg-dd-border text-dd-text rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition-colors">
+                <span class="text-base">🦕</span>
+                <span>Sapa Lagi Dinosaurus</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 min-w-0 flex flex-col min-h-screen bg-dd-bg">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="tab-content active p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-dd-text mb-2">Welcome Back, Creator!</h2>
+                    <p class="text-dd-muted text-sm md:text-base">Your complete offline-ready creative suite for gradients, typography, social banners, quotes, and full SVG icon vault.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="app.switchTab('gradient-lab')" class="px-4 py-2.5 bg-dd-accent text-white rounded-xl text-sm font-semibold hover:bg-dd-accentHover transition-colors shadow-sm flex items-center space-x-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Quick Gradient Lab</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+                <div onclick="app.switchTab('gradient-lab')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-dd-accent flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="palette" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Gradient Lab</h3>
+                        <p class="text-sm text-dd-muted">Build linear, radial & conic gradients with precision color stops, color pickers & instant CSS export.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-dd-accent">
+                        <span>Open Lab</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div onclick="app.switchTab('font-studio')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="type" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Font Studio</h3>
+                        <p class="text-sm text-dd-muted">Explore over 40 curated Google Fonts with live font rendering, size sliders, and CSS snippet copy.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-emerald-600">
+                        <span>Explore Fonts</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div onclick="app.switchTab('post-studio')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="layout" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Post Studio</h3>
+                        <p class="text-sm text-dd-muted">Design social media banners and graphics with fully working html2canvas PNG export.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-indigo-600">
+                        <span>Open Studio</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div onclick="app.switchTab('quote-canvas')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="quote" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Quote Canvas</h3>
+                        <p class="text-sm text-dd-muted">Format inspiring editorial quotes with elegant typography, templates, and PNG export.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-amber-600">
+                        <span>Open Canvas</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div onclick="app.switchTab('gradient-text')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Gradient Text Studio</h3>
+                        <p class="text-sm text-dd-muted">Create multicolors background-clip text typography with instant CSS copy.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-purple-600">
+                        <span>Style Text</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div onclick="app.switchTab('icon-vault')" class="group p-6 bg-dd-surface rounded-2xl border border-dd-border hover:border-dd-accent transition-all cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                            <i data-lucide="box" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-1">Icon Vault</h3>
+                        <p class="text-sm text-dd-muted">Search, preview, and copy production-ready SVG icons instantly from our massive vault.</p>
+                    </div>
+                    <div class="mt-6 flex items-center text-xs font-semibold text-rose-600">
+                        <span>Browse Vault</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base">Recent Projects</h3>
+                        <button onclick="app.createNewProject()" class="text-xs bg-dd-accent text-white px-3.5 py-2 rounded-xl hover:bg-dd-accentHover transition-colors flex items-center space-x-1.5 font-medium">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+                    <div id="dashboard-projects-list" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base">Saved Favorites & Gradients</h3>
+                        <span class="text-xs text-dd-muted font-mono" id="favorites-count-badge">0 items</span>
+                    </div>
+                    <div id="dashboard-favorites-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRADIENT LAB VIEW -->
+        <section id="view-gradient-lab" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Gradient Lab</h2>
+                    <p class="text-dd-muted text-sm">Design custom linear, radial, or conic gradients with precise stops, color pickers, and instant CSS export.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="gradientLab.randomize()" class="px-4 py-2.5 bg-dd-subtle hover:bg-dd-border text-dd-text text-sm font-semibold rounded-xl transition-colors flex items-center space-x-2">
+                        <i data-lucide="shuffle" class="w-4 h-4"></i>
+                        <span>Randomize</span>
+                    </button>
+                    <button onclick="gradientLab.saveFavorite()" class="px-4 py-2.5 bg-dd-accent text-white text-sm font-semibold rounded-xl hover:bg-dd-accentHover transition-colors flex items-center space-x-2 shadow-sm">
+                        <i data-lucide="heart" class="w-4 h-4"></i>
+                        <span>Save Favorite</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-7 flex flex-col space-y-6">
+                    <div id="gradient-preview-box" class="w-full h-80 md:h-[420px] rounded-2xl shadow-md border border-dd-border transition-all duration-300 relative overflow-hidden flex items-center justify-center">
+                        <div class="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white px-3.5 py-2 rounded-xl text-xs font-mono shadow-lg" id="gradient-css-label">
+                            linear-gradient(...)
+                        </div>
+                    </div>
+
+                    <div class="bg-dd-surface p-5 rounded-2xl border border-dd-border shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-bold text-dd-text">Generated CSS Property</span>
+                            <button onclick="gradientLab.copyCSS()" class="text-xs bg-dd-subtle hover:bg-dd-border text-dd-text px-3.5 py-2 rounded-xl transition-colors flex items-center space-x-1.5 font-semibold">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span>Copy CSS</span>
+                            </button>
+                        </div>
+                        <pre id="gradient-css-code" class="bg-dd-subtle p-3.5 rounded-xl text-xs font-mono text-dd-text overflow-x-auto"></pre>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="gradientLab.sendTo('post')" class="p-3.5 bg-dd-surface hover:bg-dd-subtle border border-dd-border rounded-xl text-xs font-semibold text-center transition-colors flex flex-col items-center justify-center space-y-1.5 shadow-sm">
+                            <i data-lucide="layout" class="w-4 h-4 text-dd-accent"></i>
+                            <span>Send to Post Studio</span>
+                        </button>
+                        <button onclick="gradientLab.sendTo('quote')" class="p-3.5 bg-dd-surface hover:bg-dd-subtle border border-dd-border rounded-xl text-xs font-semibold text-center transition-colors flex flex-col items-center justify-center space-y-1.5 shadow-sm">
+                            <i data-lucide="quote" class="w-4 h-4 text-dd-accent"></i>
+                            <span>Send to Quote Canvas</span>
+                        </button>
+                        <button onclick="gradientLab.sendTo('gradient-text')" class="p-3.5 bg-dd-surface hover:bg-dd-subtle border border-dd-border rounded-xl text-xs font-semibold text-center transition-colors flex flex-col items-center justify-center space-y-1.5 shadow-sm">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-dd-accent"></i>
+                            <span>Send to Text Studio</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-6 shadow-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2.5">Gradient Type</label>
+                        <div class="grid grid-cols-3 gap-2" id="gradient-type-buttons">
+                            <button onclick="gradientLab.setType('linear')" data-type="linear" class="py-2.5 px-3 text-xs font-semibold rounded-xl border border-dd-border bg-dd-accent text-white shadow-sm transition-all">Linear</button>
+                            <button onclick="gradientLab.setType('radial')" data-type="radial" class="py-2.5 px-3 text-xs font-semibold rounded-xl border border-dd-border bg-dd-subtle text-dd-text hover:bg-dd-border transition-all">Radial</button>
+                            <button onclick="gradientLab.setType('conic')" data-type="conic" class="py-2.5 px-3 text-xs font-semibold rounded-xl border border-dd-border bg-dd-subtle text-dd-text hover:bg-dd-border transition-all">Conic</button>
+                        </div>
+                    </div>
+
+                    <div id="angle-control-group">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-dd-muted uppercase tracking-wider">Angle / Direction</label>
+                            <span id="gradient-angle-val" class="text-xs font-mono font-bold text-dd-text">90deg</span>
+                        </div>
+                        <input type="range" id="gradient-angle-slider" min="0" max="360" value="90" class="w-full accent-dd-accent cursor-pointer" oninput="gradientLab.updateAngle(this.value)">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-xs font-bold text-dd-muted uppercase tracking-wider">Color Stops (Up to 5)</label>
+                            <button onclick="gradientLab.addColorStop()" class="text-xs text-dd-accent font-bold hover:underline flex items-center space-x-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                <span>Add Stop</span>
+                            </button>
+                        </div>
+                        <div id="gradient-stops-list" class="space-y-3"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2.5">Curated Presets</label>
+                        <div class="grid grid-cols-4 gap-2.5" id="gradient-presets-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FONT STUDIO VIEW -->
+        <section id="view-font-studio" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Font Studio</h2>
+                    <p class="text-dd-muted text-sm">Explore over 40 Google Fonts, test live typography in real-time, and get production CSS.</p>
+                </div>
+                <div class="flex items-center space-x-2 bg-dd-surface border border-dd-border rounded-xl p-1 shadow-sm">
+                    <button onclick="fontStudio.switchSubTab('catalog')" id="subtab-btn-catalog" class="px-4 py-2 text-xs font-semibold rounded-lg bg-dd-accent text-white transition-all shadow-sm">Catalog</button>
+                    <button onclick="fontStudio.switchSubTab('preview')" id="subtab-btn-preview" class="px-4 py-2 text-xs font-semibold rounded-lg text-dd-text hover:bg-dd-subtle transition-all">Live Tester</button>
+                </div>
+            </div>
+
+            <!-- Subview Catalog -->
+            <div id="font-subview-catalog" class="space-y-6">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between bg-dd-surface p-4 rounded-2xl border border-dd-border shadow-sm">
+                    <div class="relative w-full md:w-96">
+                        <i data-lucide="search" class="w-4 h-4 text-dd-muted absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="font-search-input" oninput="fontStudio.filterCatalog()" placeholder="Search fonts..." class="w-full pl-10 pr-4 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm focus:outline-none focus:border-dd-accent">
+                    </div>
+                    <div class="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0" id="font-category-filters"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="font-catalog-grid"></div>
+            </div>
+
+            <!-- Subview Live Tester -->
+            <div id="font-subview-preview" class="space-y-6 hidden">
+                <div class="bg-dd-surface p-8 rounded-2xl border border-dd-border shadow-sm">
+                    <div class="mb-6 pb-6 border-b border-dd-border">
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Live Custom Sample Text</label>
+                        <input type="text" id="font-preview-custom-text" value="Crafting digital products with passion and precision." oninput="fontStudio.updateLiveText(this.value)" class="w-full px-4 py-3 bg-dd-subtle border border-dd-border rounded-xl text-base font-medium focus:outline-none focus:border-dd-accent">
+                    </div>
+
+                    <div id="font-live-preview-box" class="p-8 md:p-16 bg-dd-subtle/60 rounded-2xl text-center min-h-[280px] flex flex-col items-center justify-center transition-all duration-200">
+                        <h3 id="preview-box-heading" class="text-3xl md:text-5xl mb-4 font-normal tracking-tight">Crafting digital products with passion and precision.</h3>
+                        <p id="preview-box-meta" class="text-xs text-dd-muted font-mono">Font: Inter • Regular 400</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-4 shadow-sm">
+                        <h4 class="font-bold text-sm">Font Family</h4>
+                        <select id="preview-font-select" onchange="fontStudio.updateLivePreview()" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent"></select>
+                    </div>
+
+                    <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-4 shadow-sm">
+                        <div class="flex justify-between text-xs font-bold text-dd-muted">
+                            <span>Font Size</span>
+                            <span id="font-size-val" class="font-mono">36px</span>
+                        </div>
+                        <input type="range" id="preview-size-slider" min="16" max="72" value="36" class="w-full accent-dd-accent cursor-pointer" oninput="fontStudio.updateLivePreview()">
+                    </div>
+
+                    <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-4 shadow-sm">
+                        <h4 class="font-bold text-sm">CSS Snippet</h4>
+                        <button onclick="fontStudio.openCodeModal()" class="w-full py-2.5 bg-dd-accent text-white rounded-xl text-xs font-semibold hover:bg-dd-accentHover transition-colors flex items-center justify-center space-x-2 shadow-sm">
+                            <i data-lucide="code" class="w-4 h-4"></i>
+                            <span>View CSS & Import</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- POST STUDIO VIEW -->
+        <section id="view-post-studio" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Post Studio</h2>
+                    <p class="text-dd-muted text-sm">Design social media banners and graphics, then download instantly as a high-res PNG.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="postStudio.reset()" class="px-4 py-2.5 bg-dd-subtle hover:bg-dd-border text-dd-text text-sm font-semibold rounded-xl transition-colors">Reset</button>
+                    <button onclick="postStudio.exportPNG()" class="px-5 py-2.5 bg-dd-accent text-white text-sm font-semibold rounded-xl hover:bg-dd-accentHover transition-colors flex items-center space-x-2 shadow-sm">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export PNG</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8 flex flex-col items-center justify-center bg-dd-subtle/60 p-6 md:p-10 rounded-2xl border border-dd-border min-h-[520px]">
+                    <div id="post-canvas-wrapper" class="relative shadow-2xl overflow-hidden transition-all duration-300 rounded-xl" style="width: 420px; height: 420px; background: linear-gradient(135deg, #5278D8, #9333ea);">
+                        <div id="post-canvas-inner" class="w-full h-full relative p-8 flex flex-col justify-between">
+                            <div class="w-full flex justify-between items-center text-white/80 text-xs font-mono">
+                                <span>DesignDeck Studio</span>
+                                <span id="post-badge-label">#Creative</span>
+                            </div>
+                            <div class="space-y-3 my-auto text-center">
+                                <div id="post-text-main" contenteditable="true" class="text-white font-bold text-3xl md:text-4xl outline-none drop-shadow-md leading-tight">
+                                    Build Without Limits
+                                </div>
+                                <div id="post-text-sub" contenteditable="true" class="text-white/90 font-normal text-sm outline-none drop-shadow">
+                                    DesignDeck Creative Studio • 2026
+                                </div>
+                            </div>
+                            <div class="w-full text-center text-white/70 text-[11px] font-mono">
+                                designdeck.studio
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-6 shadow-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Aspect Ratio / Format</label>
+                        <select id="post-size-select" onchange="postStudio.changeSize(this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                            <option value="420:420">Square Post (1:1 — 1080x1080)</option>
+                            <option value="420:525">Instagram Portrait (4:5 — 1080x1350)</option>
+                            <option value="420:746">Instagram Story (9:16 — 1080x1920)</option>
+                            <option value="500:281">Twitter Banner (16:9 — 1200x675)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Quick Templates</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="postStudio.applyTemplate('startup')" class="p-2.5 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle transition-colors text-left">Startup Launch</button>
+                            <button onclick="postStudio.applyTemplate('quote')" class="p-2.5 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle transition-colors text-left">Minimal Card</button>
+                            <button onclick="postStudio.applyTemplate('promo')" class="p-2.5 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle transition-colors text-left">Promo Banner</button>
+                            <button onclick="postStudio.applyTemplate('gradient')" class="p-2.5 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle transition-colors text-left">Vibrant Glow</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Canvas Background</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="post-bg-color" value="#5278D8" onchange="postStudio.changeBgColor(this.value)" class="w-10 h-10 rounded-xl border border-dd-border cursor-pointer bg-transparent">
+                            <span class="text-xs text-dd-muted font-medium">Or apply from Gradient Lab</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Typography Content</label>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-[11px] text-dd-muted mb-1 block font-medium">Main Headline</label>
+                                <input type="text" id="post-input-title" value="Build Without Limits" oninput="postStudio.updateText('main', this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-dd-muted mb-1 block font-medium">Subtitle / Footer</label>
+                                <input type="text" id="post-input-sub" value="DesignDeck Creative Studio • 2026" oninput="postStudio.updateText('sub', this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Font Family</label>
+                        <select id="post-font-family" onchange="postStudio.changeFont(this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                            <option value="Inter">Inter (Sans-serif)</option>
+                            <option value="Playfair Display">Playfair Display (Serif)</option>
+                            <option value="Space Grotesk">Space Grotesk (Modern)</option>
+                            <option value="Fira Code">Fira Code (Monospace)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUOTE CANVAS VIEW -->
+        <section id="view-quote-canvas" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Quote Canvas</h2>
+                    <p class="text-dd-muted text-sm">Craft inspiring editorial quotes and export instantly as a PNG image.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="quoteCanvas.randomize()" class="px-4 py-2.5 bg-dd-subtle hover:bg-dd-border text-dd-text text-sm font-semibold rounded-xl transition-colors flex items-center space-x-1.5">
+                        <i data-lucide="shuffle" class="w-4 h-4"></i>
+                        <span>Random Quote</span>
+                    </button>
+                    <button onclick="quoteCanvas.exportPNG()" class="px-5 py-2.5 bg-dd-accent text-white text-sm font-semibold rounded-xl hover:bg-dd-accentHover transition-colors flex items-center space-x-2 shadow-sm">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Export PNG</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8 flex items-center justify-center bg-dd-subtle/60 p-8 md:p-12 rounded-2xl border border-dd-border min-h-[480px]">
+                    <div id="quote-card-preview" class="w-full max-w-xl aspect-[4/3] rounded-2xl p-10 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all duration-300" style="background: #FFFFFF; color: #252525; border: 1px solid #E8E8E5;">
+                        <div class="text-dd-accent">
+                            <i data-lucide="quote" class="w-10 h-10 opacity-30"></i>
+                        </div>
+                        <div class="my-auto py-6">
+                            <p id="quote-preview-text" class="text-xl md:text-2xl font-serif leading-relaxed italic">
+                                "Simplicity is the ultimate sophistication."
+                            </p>
+                            <p id="quote-preview-author" class="mt-4 text-xs font-bold tracking-widest uppercase text-dd-muted">
+                                — Leonardo da Vinci
+                            </p>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-dd-muted opacity-60 font-mono">
+                            <span>DesignDeck Quote</span>
+                            <span id="quote-preview-style-label">Editorial Clean</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-6 shadow-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Quote Text</label>
+                        <textarea id="quote-input-text" rows="3" oninput="quoteCanvas.updateText()" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent resize-none">Simplicity is the ultimate sophistication.</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Author Name</label>
+                        <input type="text" id="quote-input-author" value="Leonardo da Vinci" oninput="quoteCanvas.updateText()" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Editorial Style Template</label>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <button onclick="quoteCanvas.setTemplate('editorial')" class="p-3 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle text-left transition-colors">Clean Editorial</button>
+                            <button onclick="quoteCanvas.setTemplate('dark')" class="p-3 text-xs font-semibold border border-dd-border rounded-xl bg-gray-900 text-white text-left transition-colors">Midnight Luxe</button>
+                            <button onclick="quoteCanvas.setTemplate('warm')" class="p-3 text-xs font-semibold border border-dd-border rounded-xl bg-amber-50 text-amber-900 text-left transition-colors">Warm Paper</button>
+                            <button onclick="quoteCanvas.setTemplate('gradient')" class="p-3 text-xs font-semibold border border-dd-border rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-left transition-colors">Vibrant Glow</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Font Family</label>
+                        <select id="quote-font-select" onchange="quoteCanvas.setFont(this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                            <option value="Playfair Display">Playfair Display (Serif)</option>
+                            <option value="Inter">Inter (Sans-serif)</option>
+                            <option value="Lora">Lora (Editorial Serif)</option>
+                            <option value="Space Grotesk">Space Grotesk</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRADIENT TEXT STUDIO VIEW -->
+        <section id="view-gradient-text" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Gradient Text Studio</h2>
+                    <p class="text-dd-muted text-sm">Create breathtaking multicolored gradient typography for headlines and hero banners.</p>
+                </div>
+                <button onclick="gradientTextStudio.copyCSS()" class="px-5 py-2.5 bg-dd-accent text-white text-sm font-semibold rounded-xl hover:bg-dd-accentHover transition-colors flex items-center space-x-2 shadow-sm">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                    <span>Copy CSS Snippet</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-7 bg-dd-surface p-8 md:p-12 rounded-2xl border border-dd-border flex flex-col justify-center items-center min-h-[380px] shadow-sm">
+                    <div class="text-center p-6 w-full">
+                        <h3 id="gt-preview-heading" class="text-4xl md:text-6xl font-extrabold tracking-tight mb-4 transition-all" style="background: linear-gradient(90deg, #5278D8, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            Design Without Limits
+                        </h3>
+                        <p class="text-xs text-dd-muted font-mono mt-4">CSS background-clip: text enabled with webkit fallback</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 bg-dd-surface p-6 rounded-2xl border border-dd-border space-y-6 shadow-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Headline Text</label>
+                        <input type="text" id="gt-input-text" value="Design Without Limits" oninput="gradientTextStudio.updateText(this.value)" class="w-full px-3.5 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-dd-muted uppercase tracking-wider">Gradient Angle</label>
+                            <span id="gt-angle-label" class="text-xs font-mono font-bold">90deg</span>
+                        </div>
+                        <input type="range" id="gt-angle-slider" min="0" max="360" value="90" class="w-full accent-dd-accent cursor-pointer" oninput="gradientTextStudio.updateAngle(this.value)">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-dd-muted uppercase tracking-wider mb-2">Preset Palettes</label>
+                        <div class="grid grid-cols-3 gap-2.5" id="gt-presets-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ICON VAULT VIEW -->
+        <section id="view-icon-vault" class="tab-content p-6 md:p-10 max-w-7xl mx-auto w-full animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight text-dd-text">Icon Vault</h2>
+                    <p class="text-dd-muted text-sm">Search, preview, and copy production-ready SVG icons instantly from our massive vault.</p>
+                </div>
+                <div class="relative w-full md:w-80">
+                    <i data-lucide="search" class="w-4 h-4 text-dd-muted absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="icon-search-input" oninput="iconVault.filterIcons()" placeholder="Search icons..." class="w-full pl-10 pr-4 py-2.5 bg-dd-subtle border border-dd-border rounded-xl text-sm font-medium focus:outline-none focus:border-dd-accent">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 overflow-x-auto pb-4 mb-6" id="icon-category-filters"></div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="icon-vault-grid"></div>
+        </section>
+
+    </main>
+
+    <!-- CODE SNIPPET MODAL -->
+    <div id="code-snippet-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-dd-surface w-full max-w-2xl rounded-2xl border border-dd-border p-6 shadow-2xl relative animate-fade">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-lg">Copy Code Center</h3>
+                <button onclick="app.closeModal('code-snippet-modal')" class="p-2 rounded-xl text-dd-muted hover:bg-dd-subtle">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-dd-muted">Google Font Import URL</span>
+                        <button onclick="app.copyText('modal-code-import')" class="text-xs text-dd-accent font-bold hover:underline">Copy</button>
+                    </div>
+                    <pre id="modal-code-import" class="bg-dd-subtle p-3.5 rounded-xl text-xs font-mono text-dd-text overflow-x-auto"></pre>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-dd-muted">CSS Declaration</span>
+                        <button onclick="app.copyText('modal-code-css')" class="text-xs text-dd-accent font-bold hover:underline">Copy</button>
+                    </div>
+                    <pre id="modal-code-css" class="bg-dd-subtle p-3.5 rounded-xl text-xs font-mono text-dd-text overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        // --- WEB AUDIO API SOUND MANAGER ---
+        class SoundManager {
+            constructor() {
+                this.audioCtx = null;
+                this.enabled = localStorage.getItem('dd_sound_enabled') !== 'false';
+                this.volume = parseFloat(localStorage.getItem('dd_sound_volume')) || 0.5;
+            }
+
+            init() {
+                if (!this.audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.audioCtx && this.audioCtx.state === 'suspended') {
+                    this.audioCtx.resume();
+                }
+            }
+
+            play(type = 'click') {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.audioCtx) return;
+
+                    const osc = this.audioCtx.createOscillator();
+                    const gain = this.audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.audioCtx.destination);
+
+                    const now = this.audioCtx.currentTime;
+                    gain.gain.setValueAtTime(this.volume * 0.15, now);
+
+                    if (type === 'click') {
+                        osc.frequency.setValueAtTime(400, now);
+                        osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                        osc.start(now);
+                        osc.stop(now + 0.05);
+                    } else if (type === 'success') {
+                        osc.frequency.setValueAtTime(523.25, now); // C5
+                        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc.start(now);
+                        osc.stop(now + 0.3);
+                    } else if (type === 'save') {
+                        osc.frequency.setValueAtTime(300, now);
+                        osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                        osc.start(now);
+                        osc.stop(now + 0.15);
+                    } else if (type === 'dino') {
+                        osc.frequency.setValueAtTime(600, now);
+                        osc.frequency.setValueAtTime(800, now + 0.1);
+                        osc.frequency.setValueAtTime(500, now + 0.2);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                        osc.start(now);
+                        osc.stop(now + 0.25);
+                    }
+                } catch (e) {
+                    console.warn('Audio play failed:', e);
+                }
+            }
+
+            toggleSound() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('dd_sound_enabled', this.enabled);
+                const btn = document.getElementById('sound-toggle-btn');
+                if (btn) {
+                    btn.innerText = this.enabled ? 'ON' : 'OFF';
+                    btn.className = this.enabled ? 'px-2 py-0.5 rounded-lg bg-dd-surface border border-dd-border font-bold text-[10px] text-dd-accent' : 'px-2 py-0.5 rounded-lg bg-dd-surface border border-dd-border font-bold text-[10px] text-dd-muted';
+                }
+                if (this.enabled) this.play('success');
+            }
+
+            setVolume(val) {
+                this.volume = parseFloat(val);
+                localStorage.setItem('dd_sound_volume', this.volume);
+                this.play('click');
+            }
+        }
+
+        const soundManager = new SoundManager();
+
+        // --- APPLICATION STATE & MAIN CLASS ---
+        const appState = {
+            currentView: 'dashboard',
+            welcomeShown: localStorage.getItem('dd_welcome_shown') === 'true',
+            projects: JSON.parse(localStorage.getItem('dd_projects')) || [
+                { id: 'p1', title: 'SaaS Hero Banner', type: 'Post Studio', date: '2026-06-12' },
+                { id: 'p2', title: 'Editorial Quote Card', type: 'Quote Canvas', date: '2026-06-10' }
+            ],
+            favorites: JSON.parse(localStorage.getItem('dd_favorites')) || [
+                { type: 'gradient', name: 'Vibrant Indigo', value: 'linear-gradient(90deg, #5278D8, #ec4899)' }
+            ]
+        };
+
+        const fontCatalogData = [
+            { name: 'Inter', category: 'Sans-serif', weights: '300, 400, 500, 600, 700' },
+            { name: 'Playfair Display', category: 'Serif', weights: '400, 600, 700' },
+            { name: 'Space Grotesk', category: 'Modern', weights: '400, 600, 700' },
+            { name: 'Fira Code', category: 'Monospace', weights: '400, 600' },
+            { name: 'Lora', category: 'Editorial', weights: '400, 600' },
+            { name: 'Poppins', category: 'Sans-serif', weights: '300, 400, 500, 600, 700' },
+            { name: 'Roboto', category: 'Sans-serif', weights: '300, 400, 500, 700' },
+            { name: 'Montserrat', category: 'Sans-serif', weights: '300, 400, 500, 600, 700' },
+            { name: 'Nunito', category: 'Rounded', weights: '400, 600, 700' },
+            { name: 'Raleway', category: 'Geometric', weights: '400, 500, 600, 700' },
+            { name: 'Oswald', category: 'Display', weights: '400, 600, 700' },
+            { name: 'Merriweather', category: 'Serif', weights: '300, 400, 700' },
+            { name: 'DM Sans', category: 'Minimalist', weights: '400, 500, 700' },
+            { name: 'JetBrains Mono', category: 'Monospace', weights: '400, 600, 700' },
+            { name: 'Bebas Neue', category: 'Display', weights: '400' },
+            { name: 'Anton', category: 'Display', weights: '400' },
+            { name: 'Abril Fatface', category: 'Editorial', weights: '400' },
+            { name: 'Cormorant Garamond', category: 'Luxury', weights: '400, 600, 700' },
+            { name: 'Libre Baskerville', category: 'Classic', weights: '400, 700' },
+            { name: 'Work Sans', category: 'Professional', weights: '400, 500, 600, 700' },
+            { name: 'Manrope', category: 'Modern', weights: '400, 500, 600, 700' },
+            { name: 'Outfit', category: 'Geometric', weights: '400, 500, 600, 700' },
+            { name: 'Rubik', category: 'Rounded', weights: '400, 500, 700' },
+            { name: 'Quicksand', category: 'Playful', weights: '400, 500, 700' },
+            { name: 'Comfortaa', category: 'Rounded', weights: '400, 700' },
+            { name: 'Dancing Script', category: 'Script', weights: '400, 700' },
+            { name: 'Pacifico', category: 'Script', weights: '400' },
+            { name: 'Caveat', category: 'Handwriting', weights: '400, 700' },
+            { name: 'Great Vibes', category: 'Script', weights: '400' },
+            { name: 'Lobster', category: 'Display', weights: '400' },
+            { name: 'Archivo', category: 'Grotesk', weights: '400, 600, 700' },
+            { name: 'Urbanist', category: 'Geometric', weights: '400, 500, 600, 700' },
+            { name: 'IBM Plex Sans', category: 'Professional', weights: '400, 500, 600, 700' },
+            { name: 'IBM Plex Mono', category: 'Monospace', weights: '400, 600' }
+        ];
+
+        const iconCategories = [
+            'All', 'Arrows', 'Navigation', 'Interface', 'Actions', 'Editing', 'Files', 
+            'Communication', 'People', 'Social', 'Media', 'Business', 'Finance', 'Devices', 
+            'Code', 'Security', 'Nature', 'Animals', 'Food', 'Travel', 'Maps', 'Education', 'Health'
+        ];
+
+        const iconVaultData = [
+            // Arrows & Nav
+            { name: 'arrow-right', category: 'Arrows', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>' },
+            { name: 'arrow-left', category: 'Arrows', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>' },
+            { name: 'chevron-down', category: 'Arrows', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>' },
+            { name: 'home', category: 'Navigation', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>' },
+            { name: 'menu', category: 'Navigation', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>' },
+            { name: 'search', category: 'Interface', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>' },
+            { name: 'settings', category: 'Interface', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
+            // Actions & Editing
+            { name: 'check', category: 'Actions', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' },
+            { name: 'plus', category: 'Actions', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>' },
+            { name: 'trash-2', category: 'Actions', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>' },
+            { name: 'edit', category: 'Editing', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>' },
+            { name: 'copy', category: 'Editing', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>' },
+            // Files & Communication
+            { name: 'file-text', category: 'Files', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' },
+            { name: 'folder', category: 'Files', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>' },
+            { name: 'mail', category: 'Communication', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>' },
+            { name: 'message-square', category: 'Communication', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>' },
+            // People & Social
+            { name: 'user', category: 'People', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>' },
+            { name: 'users', category: 'People', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>' },
+            { name: 'share-2', category: 'Social', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>' },
+            { name: 'heart', category: 'Social', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>' },
+            // Media & Business
+            { name: 'play', category: 'Media', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' },
+            { name: 'camera', category: 'Media', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' },
+            { name: 'briefcase', category: 'Business', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>' },
+            { name: 'shopping-bag', category: 'Business', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>' },
+            // Finance, Code, Devices & Security
+            { name: 'credit-card', category: 'Finance', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>' },
+            { name: 'dollar-sign', category: 'Finance', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' },
+            { name: 'code', category: 'Code', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>' },
+            { name: 'terminal', category: 'Code', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' },
+            { name: 'smartphone', category: 'Devices', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>' },
+            { name: 'laptop', category: 'Devices', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>' },
+            { name: 'shield', category: 'Security', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>' },
+            { name: 'lock', category: 'Security', svg: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>' }
+        ];
+
+        class DesignDeckApp {
+            constructor() {
+                this.initWelcomeModal();
+                this.initNavigation();
+                this.renderDashboard();
+                gradientLab.init();
+                fontStudio.init();
+                postStudio.init();
+                quoteCanvas.init();
+                gradientTextStudio.init();
+                iconVault.init();
+                lucide.createIcons();
+            }
+
+            initWelcomeModal() {
+                const modal = document.getElementById('welcome-modal');
+                if (appState.welcomeShown) {
+                    modal.classList.add('hidden');
+                } else {
+                    modal.classList.remove('hidden');
+                }
+            }
+
+            closeWelcome(startCreative = false) {
+                soundManager.play('click');
+                const modal = document.getElementById('welcome-modal');
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('opacity-0');
+                }, 300);
+                appState.welcomeShown = true;
+                localStorage.setItem('dd_welcome_shown', 'true');
+                if (startCreative) {
+                    this.switchTab('gradient-lab');
+                }
+            }
+
+            interactDino() {
+                soundManager.play('dino');
+                const bubbles = ["Rawr! ✨", "Senang berkenalan!", "Yuk bikin gradient!", "DesignDeck hebat! 🦕", "Hore! 🎉"];
+                const bubble = document.getElementById('dino-speech-bubble');
+                const randomMsg = bubbles[Math.floor(Math.random() * bubbles.length)];
+                bubble.innerText = randomMsg;
+                setTimeout(() => {
+                    bubble.innerText = "Halo! 🦕";
+                }, 2000);
+            }
+
+            toggleMobileMenu() {
+                soundManager.play('click');
+                const drawer = document.getElementById('mobile-drawer');
+                drawer.classList.toggle('hidden');
+            }
+
+            initNavigation() {
+                const navItems = [
+                    { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+                    { id: 'gradient-lab', label: 'Gradient Lab', icon: 'palette' },
+                    { id: 'font-studio', label: 'Font Studio', icon: 'type' },
+                    { id: 'post-studio', label: 'Post Studio', icon: 'layout' },
+                    { id: 'quote-canvas', label: 'Quote Canvas', icon: 'quote' },
+                    { id: 'gradient-text', label: 'Gradient Text', icon: 'sparkles' },
+                    { id: 'icon-vault', label: 'Icon Vault', icon: 'box' }
+                ];
+
+                const renderLinks = (containerId) => {
+                    const container = document.getElementById(containerId);
+                    if (!container) return;
+                    container.innerHTML = navItems.map(item => `
+                        <button onclick="app.switchTab('${item.id}')" data-nav="${item.id}" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${appState.currentView === item.id ? 'bg-dd-accent text-white shadow-sm' : 'text-dd-text hover:bg-dd-subtle'}">
+                            <i data-lucide="${item.icon}" class="w-4 h-4"></i>
+                            <span>${item.label}</span>
+                        </button>
+                    `).join('');
+                };
+
+                renderLinks('desktop-nav-links');
+                renderLinks('mobile-nav-links');
+            }
+
+            switchTab(tabId) {
+                soundManager.play('click');
+                appState.currentView = tabId;
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.getElementById(`view-${tabId}`).classList.add('active');
+                const drawer = document.getElementById('mobile-drawer');
+                if (drawer) drawer.classList.add('hidden');
+
+                document.querySelectorAll('[data-nav]').forEach(el => {
+                    if (el.getAttribute('data-nav') === tabId) {
+                        el.className = 'w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold bg-dd-accent text-white shadow-sm transition-colors';
+                    } else {
+                        el.className = 'w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-dd-text hover:bg-dd-subtle transition-colors';
+                    }
+                });
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                lucide.createIcons();
+            }
+
+            renderDashboard() {
+                const projList = document.getElementById('dashboard-projects-list');
+                projList.innerHTML = appState.projects.map(p => `
+                    <div class="flex items-center justify-between p-3.5 bg-dd-subtle/70 rounded-xl border border-dd-border/70">
+                        <div>
+                            <h4 class="font-semibold text-sm text-dd-text">${p.title}</h4>
+                            <span class="text-[11px] text-dd-muted font-mono">${p.type} • ${p.date}</span>
+                        </div>
+                        <span class="text-xs text-dd-accent font-bold cursor-pointer hover:underline" onclick="app.switchTab('${p.type.toLowerCase().includes('post') ? 'post-studio' : 'quote-canvas'}')">Open</span>
+                    </div>
+                `).join('');
+
+                const favList = document.getElementById('dashboard-favorites-list');
+                document.getElementById('favorites-count-badge').innerText = `${appState.favorites.length} saved`;
+                favList.innerHTML = appState.favorites.map(f => `
+                    <div class="flex items-center justify-between p-3.5 bg-dd-subtle/70 rounded-xl border border-dd-border/70">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-7 h-7 rounded-lg shadow-sm border border-dd-border" style="background: ${f.value}"></div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-dd-text">${f.name}</h4>
+                                <span class="text-[11px] text-dd-muted font-mono">${f.type}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            createNewProject() {
+                soundManager.play('save');
+                this.showToast('New project workspace created successfully!');
+                appState.projects.unshift({ id: 'p_' + Date.now(), title: 'Untitled Graphic', type: 'Post Studio', date: new Date().toISOString().split('T')[0] });
+                localStorage.setItem('dd_projects', JSON.stringify(appState.projects));
+                this.renderDashboard();
+            }
+
+            showToast(message) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'animate-fade bg-dd-surface text-dd-text border border-dd-border px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 text-xs font-semibold pointer-events-auto';
+                toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i><span>${message}</span>`;
+                container.appendChild(toast);
+                lucide.createIcons();
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            openCodeModal(importCode, cssCode) {
+                soundManager.play('click');
+                document.getElementById('modal-code-import').innerText = importCode || "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');";
+                document.getElementById('modal-code-css').innerText = cssCode || "font-family: 'Inter', sans-serif;";
+                document.getElementById('code-snippet-modal').classList.remove('hidden');
+                document.getElementById('code-snippet-modal').classList.add('flex');
+            }
+
+            closeModal(modalId) {
+                soundManager.play('click');
+                document.getElementById(modalId).classList.add('hidden');
+                document.getElementById(modalId).classList.remove('flex');
+            }
+
+            copyText(elementId) {
+                soundManager.play('success');
+                const text = document.getElementById(elementId).innerText;
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showToast('Copied to clipboard!');
+                } catch (err) {
+                    this.showToast('Failed to copy.');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // --- GRADIENT LAB MODULE ---
+        const gradientLab = {
+            type: 'linear',
+            angle: 90,
+            stops: [
+                { color: '#5278D8', pos: 0 },
+                { color: '#ec4899', pos: 100 }
+            ],
+            presets: [
+                { name: 'Vibrant Indigo', value: 'linear-gradient(90deg, #5278D8, #ec4899)' },
+                { name: 'Emerald Dusk', value: 'linear-gradient(90deg, #10b981, #3b82f6)' },
+                { name: 'Sunset Glow', value: 'linear-gradient(90deg, #f59e0b, #ef4444)' },
+                { name: 'Cyberpunk', value: 'linear-gradient(90deg, #8b5cf6, #ec4899, #facc15)' }
+            ],
+
+            init() {
+                this.renderStops();
+                this.renderPresets();
+                this.updatePreview();
+            },
+
+            setType(t) {
+                soundManager.play('click');
+                this.type = t;
+                document.querySelectorAll('#gradient-type-buttons button').forEach(btn => {
+                    if (btn.getAttribute('data-type') === t) {
+                        btn.className = 'py-2.5 px-3 text-xs font-semibold rounded-xl border border-dd-border bg-dd-accent text-white shadow-sm transition-all';
+                    } else {
+                        btn.className = 'py-2.5 px-3 text-xs font-semibold rounded-xl border border-dd-border bg-dd-subtle text-dd-text hover:bg-dd-border transition-all';
+                    }
+                });
+                document.getElementById('angle-control-group').style.display = t === 'radial' ? 'none' : 'block';
+                this.updatePreview();
+            },
+
+            updateAngle(val) {
+                this.angle = val;
+                document.getElementById('gradient-angle-val').innerText = `${val}deg`;
+                this.updatePreview();
+            },
+
+            addColorStop() {
+                soundManager.play('click');
+                if (this.stops.length >= 5) {
+                    app.showToast('Maximum 5 color stops allowed.');
+                    return;
+                }
+                this.stops.push({ color: '#f59e0b', pos: 50 });
+                this.renderStops();
+                this.updatePreview();
+            },
+
+            removeStop(index) {
+                soundManager.play('click');
+                if (this.stops.length <= 2) {
+                    app.showToast('Minimum 2 color stops required.');
+                    return;
+                }
+                this.stops.splice(index, 1);
+                this.renderStops();
+                this.updatePreview();
+            },
+
+            updateStopColor(index, color) {
+                this.stops[index].color = color;
+                this.updatePreview();
+            },
+
+            renderStops() {
+                const container = document.getElementById('gradient-stops-list');
+                container.innerHTML = this.stops.map((stop, idx) => `
+                    <div class="flex items-center space-x-3 bg-dd-subtle p-3 rounded-xl border border-dd-border">
+                        <input type="color" value="${stop.color}" onchange="gradientLab.updateStopColor(${idx}, this.value)" class="w-9 h-9 rounded-lg border border-dd-border cursor-pointer bg-transparent">
+                        <span class="text-xs font-mono font-bold text-dd-muted">${stop.color}</span>
+                        <button onclick="gradientLab.removeStop(${idx})" class="ml-auto text-dd-muted hover:text-red-600">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            },
+
+            renderPresets() {
+                const grid = document.getElementById('gradient-presets-grid');
+                grid.innerHTML = this.presets.map((p, idx) => `
+                    <div onclick="gradientLab.applyPreset(${idx})" class="h-12 rounded-xl cursor-pointer shadow-sm border border-dd-border hover:scale-105 transition-transform" style="background: ${p.value}" title="${p.name}"></div>
+                `).join('');
+            },
+
+            applyPreset(idx) {
+                soundManager.play('success');
+                const p = this.presets[idx];
+                if (idx === 0) this.stops = [{ color: '#5278D8', pos: 0 }, { color: '#ec4899', pos: 100 }];
+                else if (idx === 1) this.stops = [{ color: '#10b981', pos: 0 }, { color: '#3b82f6', pos: 100 }];
+                else if (idx === 2) this.stops = [{ color: '#f59e0b', pos: 0 }, { color: '#ef4444', pos: 100 }];
+                else this.stops = [{ color: '#8b5cf6', pos: 0 }, { color: '#ec4899', pos: 50 }, { color: '#facc15', pos: 100 }];
+                this.renderStops();
+                this.updatePreview();
+                app.showToast(`Applied preset: ${p.name}`);
+            },
+
+            getCssString() {
+                const stopsStr = this.stops.map(s => `${s.color} ${s.pos}%`).join(', ');
+                if (this.type === 'linear') return `linear-gradient(${this.angle}deg, ${stopsStr})`;
+                if (this.type === 'radial') return `radial-gradient(circle, ${stopsStr})`;
+                return `conic-gradient(from ${this.angle}deg at 50% 50%, ${stopsStr})`;
+            },
+
+            updatePreview() {
+                const css = this.getCssString();
+                document.getElementById('gradient-preview-box').style.background = css;
+                document.getElementById('gradient-css-label').innerText = css;
+                document.getElementById('gradient-css-code').innerText = `background: ${css};`;
+            },
+
+            randomize() {
+                soundManager.play('success');
+                const randHex = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                this.stops[0].color = randHex();
+                this.stops[1].color = randHex();
+                if (this.stops[2]) this.stops[2].color = randHex();
+                this.renderStops();
+                this.updatePreview();
+                app.showToast('Generated random gradient!');
+            },
+
+            saveFavorite() {
+                soundManager.play('save');
+                const css = this.getCssString();
+                appState.favorites.push({ type: 'gradient', name: 'Custom Gradient', value: css });
+                localStorage.setItem('dd_favorites', JSON.stringify(appState.favorites));
+                app.renderDashboard();
+                app.showToast('Saved to favorites!');
+            },
+
+            copyCSS() {
+                soundManager.play('success');
+                const css = `background: ${this.getCssString()};`;
+                const textArea = document.createElement("textarea");
+                textArea.value = css;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    app.showToast('Gradient CSS copied!');
+                } catch (err) {
+                    app.showToast('Failed to copy.');
+                }
+                document.body.removeChild(textArea);
+            },
+
+            sendTo(target) {
+                soundManager.play('click');
+                const css = this.getCssString();
+                if (target === 'post') {
+                    document.getElementById('post-canvas-wrapper').style.background = css;
+                    app.switchTab('post-studio');
+                    app.showToast('Gradient sent to Post Studio!');
+                } else if (target === 'quote') {
+                    document.getElementById('quote-card-preview').style.background = css;
+                    app.switchTab('quote-canvas');
+                    app.showToast('Gradient sent to Quote Canvas!');
+                } else if (target === 'gradient-text') {
+                    document.getElementById('gt-preview-heading').style.background = css;
+                    document.getElementById('gt-preview-heading').style.webkitBackgroundClip = 'text';
+                    document.getElementById('gt-preview-heading').style.webkitTextFillColor = 'transparent';
+                    app.switchTab('gradient-text');
+                    app.showToast('Gradient sent to Text Studio!');
+                }
+            }
+        };
+
+        // --- FONT STUDIO MODULE ---
+        const fontStudio = {
+            currentCategory: 'All',
+            init() {
+                this.injectGoogleFontsLink();
+                this.renderCategories();
+                this.renderCatalog();
+                this.renderPreviewSelects();
+            },
+
+            injectGoogleFontsLink() {
+                const families = fontCatalogData.map(f => `family=${f.name.replace(/\s+/g, '+')}:wght@${f.weights.replace(/,\s+/g, ';')}`).join('&');
+                const linkEl = document.getElementById('dynamic-google-fonts');
+                if (linkEl) {
+                    linkEl.href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+                }
+            },
+
+            switchSubTab(sub) {
+                soundManager.play('click');
+                ['catalog', 'preview'].forEach(s => {
+                    document.getElementById(`font-subview-${s}`).classList.add('hidden');
+                    document.getElementById(`subtab-btn-${s}`).className = 'px-4 py-2 text-xs font-semibold rounded-lg text-dd-text hover:bg-dd-subtle transition-all';
+                });
+                document.getElementById(`font-subview-${sub}`).classList.remove('hidden');
+                document.getElementById(`subtab-btn-${sub}`).className = 'px-4 py-2 text-xs font-semibold rounded-lg bg-dd-accent text-white transition-all shadow-sm';
+            },
+
+            renderCategories() {
+                const cats = ['All', 'Sans-serif', 'Serif', 'Modern', 'Display', 'Rounded', 'Geometric', 'Script', 'Monospace', 'Editorial'];
+                const container = document.getElementById('font-category-filters');
+                container.innerHTML = cats.map(cat => `
+                    <button onclick="fontStudio.filterByCategory('${cat}')" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition-colors ${this.currentCategory === cat ? 'bg-dd-accent text-white shadow-sm' : 'bg-dd-subtle text-dd-text hover:bg-dd-border'}">
+                        ${cat}
+                    </button>
+                `).join('');
+            },
+
+            filterByCategory(cat) {
+                soundManager.play('click');
+                this.currentCategory = cat;
+                this.renderCategories();
+                this.renderCatalog();
+            },
+
+            filterCatalog() {
+                this.renderCatalog();
+            },
+
+            renderCatalog() {
+                const search = document.getElementById('font-search-input').value.toLowerCase();
+                const grid = document.getElementById('font-catalog-grid');
+                const filtered = fontCatalogData.filter(f => {
+                    const matchCat = this.currentCategory === 'All' || f.category.toLowerCase().includes(this.currentCategory.toLowerCase());
+                    const matchSearch = f.name.toLowerCase().includes(search);
+                    return matchCat && matchSearch;
+                });
+
+                grid.innerHTML = filtered.map(f => `
+                    <div class="bg-dd-surface p-6 rounded-2xl border border-dd-border hover:border-dd-accent transition-all flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-semibold px-2.5 py-1 bg-dd-subtle text-dd-muted rounded-md">${f.category}</span>
+                                <button onclick="app.openCodeModal('@import url(\\'https://fonts.googleapis.com/css2?family=${f.name.replace(/\s+/g, '+')}:wght@400;600;700&display=swap\\');', 'font-family: \\'${f.name}\\', sans-serif;')" class="text-xs text-dd-accent font-bold hover:underline">Get CSS</button>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-3" style="font-family: '${f.name}', sans-serif;">${f.name}</h3>
+                            <p class="text-sm text-dd-muted mb-4" style="font-family: '${f.name}', sans-serif;">The quick brown fox jumps over the lazy dog.</p>
+                        </div>
+                        <div class="pt-4 border-t border-dd-border flex items-center justify-between text-xs text-dd-muted">
+                            <span class="font-mono">Weights: ${f.weights}</span>
+                            <button onclick="fontStudio.quickPreview('${f.name}')" class="text-dd-accent font-bold hover:underline">Test Live</button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            quickPreview(fontName) {
+                soundManager.play('click');
+                this.switchSubTab('preview');
+                document.getElementById('preview-font-select').value = fontName;
+                this.updateLivePreview();
+            },
+
+            renderPreviewSelects() {
+                const select = document.getElementById('preview-font-select');
+                select.innerHTML = fontCatalogData.map(f => `<option value="${f.name}">${f.name}</option>`).join('');
+            },
+
+            updateLiveText(txt) {
+                document.getElementById('preview-box-heading').innerText = txt || 'Crafting digital products with passion.';
+            },
+
+            updateLivePreview() {
+                const font = document.getElementById('preview-font-select').value;
+                const size = document.getElementById('preview-size-slider').value;
+                document.getElementById('font-size-val').innerText = `${size}px`;
+                const heading = document.getElementById('preview-box-heading');
+                heading.style.fontFamily = `'${font}', sans-serif`;
+                heading.style.fontSize = `${size}px`;
+                document.getElementById('preview-box-meta').innerText = `Font: ${font} • Size ${size}px`;
+            },
+
+            openCodeModal() {
+                soundManager.play('click');
+                const font = document.getElementById('preview-font-select').value;
+                const importStr = `@import url('https://fonts.googleapis.com/css2?family=${font.replace(/\s+/g, '+')}:wght@400;600;700&display=swap');`;
+                const cssStr = `font-family: '${font}', sans-serif;`;
+                app.openCodeModal(importStr, cssStr);
+            }
+        };
+
+        // --- POST STUDIO MODULE ---
+        const postStudio = {
+            init() {},
+            changeSize(val) {
+                soundManager.play('click');
+                const [w, h] = val.split(':');
+                const wrapper = document.getElementById('post-canvas-wrapper');
+                wrapper.style.width = `${w}px`;
+                wrapper.style.height = `${h}px`;
+            },
+            changeBgColor(color) {
+                document.getElementById('post-canvas-wrapper').style.background = color;
+            },
+            updateText(type, val) {
+                if (type === 'main') document.getElementById('post-text-main').innerText = val;
+                if (type === 'sub') document.getElementById('post-text-sub').innerText = val;
+            },
+            changeFont(fontName) {
+                soundManager.play('click');
+                document.getElementById('post-canvas-inner').style.fontFamily = `'${fontName}', sans-serif`;
+            },
+            applyTemplate(t) {
+                soundManager.play('success');
+                const wrapper = document.getElementById('post-canvas-wrapper');
+                if (t === 'startup') {
+                    wrapper.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                    document.getElementById('post-text-main').innerText = 'The Future of SaaS is Here';
+                    document.getElementById('post-text-sub').innerText = 'Announcing DesignDeck v4.0 Release';
+                } else if (t === 'quote') {
+                    wrapper.style.background = '#FFFFFF';
+                    document.getElementById('post-text-main').style.color = '#252525';
+                    document.getElementById('post-text-sub').style.color = '#737373';
+                    document.getElementById('post-text-main').innerText = '“Design is intelligence made visible.”';
+                    document.getElementById('post-text-sub').innerText = '— Alina Wheeler';
+                } else if (t === 'promo') {
+                    wrapper.style.background = 'linear-gradient(135deg, #f59e0b, #ef4444)';
+                    document.getElementById('post-text-main').innerText = 'Special Summer Sale';
+                    document.getElementById('post-text-sub').innerText = 'Up to 50% off all licenses';
+                } else {
+                    wrapper.style.background = 'linear-gradient(135deg, #5278D8, #9333ea)';
+                    document.getElementById('post-text-main').innerText = 'Build Without Limits';
+                    document.getElementById('post-text-sub').innerText = 'DesignDeck Creative Studio';
+                }
+                app.showToast(`Applied ${t} template`);
+            },
+            reset() {
+                soundManager.play('click');
+                this.applyTemplate('gradient');
+            },
+            exportPNG() {
+                soundManager.play('success');
+                const element = document.getElementById('post-canvas-wrapper');
+                html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'designdeck-post.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    app.showToast('Post exported as PNG successfully!');
+                }).catch((err) => {
+                    console.error(err);
+                    app.showToast('Export failed. Please check browser permissions.');
+                });
+            }
+        };
+
+        // --- QUOTE CANVAS MODULE ---
+        const quoteCanvas = {
+            init() {},
+            updateText() {
+                const text = document.getElementById('quote-input-text').value;
+                const author = document.getElementById('quote-input-author').value;
+                document.getElementById('quote-preview-text').innerText = `"${text}"`;
+                document.getElementById('quote-preview-author').innerText = `— ${author}`;
+            },
+            setFont(fontName) {
+                soundManager.play('click');
+                document.getElementById('quote-card-preview').style.fontFamily = `'${fontName}', sans-serif`;
+            },
+            setTemplate(t) {
+                soundManager.play('success');
+                const card = document.getElementById('quote-card-preview');
+                const label = document.getElementById('quote-preview-style-label');
+                if (t === 'editorial') {
+                    card.style.background = '#FFFFFF';
+                    card.style.color = '#252525';
+                    card.style.border = '1px solid #E8E8E5';
+                    label.innerText = 'Clean Editorial';
+                } else if (t === 'dark') {
+                    card.style.background = '#111827';
+                    card.style.color = '#F9FAFB';
+                    card.style.border = '1px solid #374151';
+                    label.innerText = 'Midnight Luxe';
+                } else if (t === 'warm') {
+                    card.style.background = '#FEF3C7';
+                    card.style.color = '#78350F';
+                    card.style.border = '1px solid #FDE68A';
+                    label.innerText = 'Warm Paper';
+                } else {
+                    card.style.background = 'linear-gradient(135deg, #2563EB, #5278D8)';
+                    card.style.color = '#FFFFFF';
+                    card.style.border = 'none';
+                    label.innerText = 'Vibrant Glow';
+                }
+                app.showToast('Applied quote style');
+            },
+            randomize() {
+                soundManager.play('success');
+                const quotes = [
+                    { t: "Simplicity is the ultimate sophistication.", a: "Leonardo da Vinci" },
+                    { t: "Design is not just what it looks like, design is how it works.", a: "Steve Jobs" },
+                    { t: "Creativity is intelligence having fun.", a: "Albert Einstein" },
+                    { t: "Good design is obvious. Great design is transparent.", a: "Joe Sparano" }
+                ];
+                const q = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('quote-input-text').value = q.t;
+                document.getElementById('quote-input-author').value = q.a;
+                this.updateText();
+                app.showToast('Loaded random quote!');
+            },
+            exportPNG() {
+                soundManager.play('success');
+                const element = document.getElementById('quote-card-preview');
+                html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'designdeck-quote.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    app.showToast('Quote exported as PNG successfully!');
+                }).catch(() => {
+                    app.showToast('Export failed.');
+                });
+            }
+        };
+
+        // --- GRADIENT TEXT STUDIO MODULE ---
+        const gradientTextStudio = {
+            angle: 90,
+            presets: [
+                { name: 'Sunset Vibe', value: 'linear-gradient(90deg, #5278D8, #ec4899, #f59e0b)' },
+                { name: 'Oceanic', value: 'linear-gradient(90deg, #3b82f6, #10b981)' },
+                { name: 'Neon Glow', value: 'linear-gradient(90deg, #8b5cf6, #ec4899, #06b6d4)' }
+            ],
+            init() {
+                this.renderPresets();
+            },
+            updateText(val) {
+                document.getElementById('gt-preview-heading').innerText = val;
+            },
+            updateAngle(val) {
+                this.angle = val;
+                document.getElementById('gt-angle-label').innerText = `${val}deg`;
+                const heading = document.getElementById('gt-preview-heading');
+                const bg = heading.style.background;
+                if (bg.includes('linear-gradient')) {
+                    heading.style.background = bg.replace(/linear-gradient\([^,]+,/, `linear-gradient(${val}deg,`);
+                }
+            },
+            renderPresets() {
+                const grid = document.getElementById('gt-presets-grid');
+                grid.innerHTML = this.presets.map((p, idx) => `
+                    <button onclick="gradientTextStudio.applyPreset(${idx})" class="p-2.5 text-xs font-semibold border border-dd-border rounded-xl hover:bg-dd-subtle truncate transition-colors">${p.name}</button>
+                `).join('');
+            },
+            applyPreset(idx) {
+                soundManager.play('success');
+                const p = this.presets[idx];
+                const heading = document.getElementById('gt-preview-heading');
+                heading.style.background = p.value;
+                heading.style.webkitBackgroundClip = 'text';
+                heading.style.webkitTextFillColor = 'transparent';
+                app.showToast(`Applied preset: ${p.name}`);
+            },
+            copyCSS() {
+                soundManager.play('success');
+                const heading = document.getElementById('gt-preview-heading');
+                const css = `background: ${heading.style.background};\n-webkit-background-clip: text;\n-webkit-text-fill-color: transparent;`;
+                const textArea = document.createElement("textarea");
+                textArea.value = css;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    app.showToast('Gradient text CSS copied!');
+                } catch (err) {
+                    app.showToast('Failed to copy.');
+                }
+                document.body.removeChild(textArea);
+            }
+        };
+
+        // --- ICON VAULT MODULE ---
+        const iconVault = {
+            currentCategory: 'All',
+            init() {
+                this.renderCategories();
+                this.renderIcons();
+            },
+            renderCategories() {
+                const container = document.getElementById('icon-category-filters');
+                container.innerHTML = iconCategories.map(cat => `
+                    <button onclick="iconVault.filterByCategory('${cat}')" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition-colors ${this.currentCategory === cat ? 'bg-dd-accent text-white shadow-sm' : 'bg-dd-subtle text-dd-text hover:bg-dd-border'}">
+                        ${cat}
+                    </button>
+                `).join('');
+            },
+            filterByCategory(cat) {
+                soundManager.play('click');
+                this.currentCategory = cat;
+                this.renderCategories();
+                this.renderIcons();
+            },
+            filterIcons() {
+                this.renderIcons();
+            },
+            renderIcons() {
+                const search = document.getElementById('icon-search-input').value.toLowerCase();
+                const grid = document.getElementById('icon-vault-grid');
+                const filtered = iconVaultData.filter(i => {
+                    const matchCat = this.currentCategory === 'All' || i.category.toLowerCase() === this.currentCategory.toLowerCase();
+                    const matchSearch = i.name.toLowerCase().includes(search);
+                    return matchCat && matchSearch;
+                });
+
+                grid.innerHTML = filtered.map(i => `
+                    <div class="bg-dd-surface p-5 rounded-2xl border border-dd-border hover:border-dd-accent transition-all flex flex-col items-center justify-center space-y-3 shadow-sm group">
+                        <div class="text-dd-text group-hover:text-dd-accent transition-colors">${i.svg}</div>
+                        <span class="text-xs font-semibold text-dd-muted">${i.name}</span>
+                        <button onclick="iconVault.copySVG('${encodeURIComponent(i.svg)}')" class="text-[11px] font-semibold bg-dd-subtle hover:bg-dd-border px-3 py-1 rounded-lg text-dd-text transition-colors">Copy SVG</button>
+                    </div>
+                `).join('');
+            },
+            copySVG(encodedSvg) {
+                soundManager.play('success');
+                const svgStr = decodeURIComponent(encodedSvg);
+                const textArea = document.createElement("textarea");
+                textArea.value = svgStr;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    app.showToast('SVG markup copied to clipboard!');
+                } catch (err) {
+                    app.showToast('Failed to copy SVG.');
+                }
+                document.body.removeChild(textArea);
+            }
+        };
+
+        let app;
+        window.onload = function() {
+            app = new DesignDeckApp();
+        };
+    </script>
+</body>
+</html>
